@@ -3,8 +3,12 @@ package net.fabricmc.example;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.command.CommandManager;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -16,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -31,7 +36,7 @@ public class ExampleMod implements ModInitializer {
 
 	public void writeToFile(String logEntry) {
 		String line = String.format("[%s] %s", getCurrentTime(), logEntry);
-		System.out.println(line);
+
         try
 		{
 			BufferedWriter out = new BufferedWriter(new FileWriter(writeFile, true));
@@ -50,8 +55,6 @@ public class ExampleMod implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		System.out.println("Hello Fabric world!");
-
 		if (!Files.exists(dir.toPath())) {
             try
 			{
@@ -69,7 +72,8 @@ public class ExampleMod implements ModInitializer {
 					.then(argument("contents", StringArgumentType.greedyString())
 						.executes(this::message)))
                 .then(literal("position")
-                    .executes(this::position))
+					.then(argument("players", EntityArgumentType.players())
+                    	.executes(this::position)))
 			);
         });
 	}
@@ -77,12 +81,30 @@ public class ExampleMod implements ModInitializer {
     private int message(CommandContext<ServerCommandSource> context) {
 		String contents = StringArgumentType.getString(context, "contents");
 		writeToFile(String.format("{%s} : %s", context.getSource().getName(), contents));
-        return 0;
+        return 1;
     }
 
     private int position(CommandContext<ServerCommandSource> context) {
-		ServerCommandSource src = context.getSource();
-		writeToFile(String.format("{%s} position: %s, %s", src.getName(), src.getWorld(), src.getPosition()));
-        return 0;
+		try
+		{
+			Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "players");
+
+			for (ServerPlayerEntity player : players)
+			{
+				String worldName = getWorldName(player);
+				writeToFile(String.format("{%s} position: %s, %s", player.getEntityName(), worldName, player.getPos()));
+			}
+		}
+		catch (Exception ex)
+		{
+   	    	return 0;
+		}
+		return 1;
     }
+
+	private String getWorldName(ServerPlayerEntity player) {
+		World world = player.getEntityWorld();
+		Identifier worldId = world.getRegistryManager().get(Registry.DIMENSION_TYPE_KEY).getId(world.getDimension());
+		return worldId.getPath();
+	}
 }
