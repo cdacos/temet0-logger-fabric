@@ -40,7 +40,7 @@ public class LoggerMod implements ModInitializer {
 		}
 
 		LoggerManager.INSTANCE.Add(new SqliteLogger(dir));
-		LoggerManager.INSTANCE.Add(new FileLogger(dir));
+		// LoggerManager.INSTANCE.Add(new FileLogger(dir));
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			dispatcher.register(literal("log").requires(source -> source.hasPermissionLevel(2))
