@@ -30,6 +30,11 @@ public class FileLogger implements ILogger {
 		writeToFile("POSITION", player, message);
     }
 
+    @Override
+    public void logChat(ServerPlayerEntity player, String message) {
+        writeToFile("CHAT", player, message);
+    }
+
     private void writeToFile(String event, ServerPlayerEntity player, String message) {
 		try {
 			String line;
@@ -39,9 +44,9 @@ public class FileLogger implements ILogger {
 				String worldName = LoggerUtils.getWorldName(player);
 				Vec3d position = player.getPos();
 				message = message != null ? message : "";
-				line = String.format("[%s] %s {%s} %s %s %s", getCurrentTime(), event, playerName, worldName, position, message);
+				line = String.format("[%s] %s: {%s} %s %s %s", getCurrentTime(), event, playerName, worldName, position, message);
 			} else {
-				line = String.format("[%s] %s %s", getCurrentTime(), event, message);
+				line = String.format("[%s] %s: %s", getCurrentTime(), event, message);
 			}
 
 			BufferedWriter out = new BufferedWriter(new FileWriter(writeFile, true));

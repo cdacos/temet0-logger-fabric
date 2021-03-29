@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
+import net.temet0.logger.data.ChatData;
 import net.temet0.logger.data.EventData;
 import net.temet0.logger.data.PlayerData;
 import net.temet0.logger.data.PositionData;
@@ -49,6 +50,19 @@ public class SqliteLogger implements ILogger {
 		}
 	}
 
+	@Override
+	public void logChat(ServerPlayerEntity playerEntity, String message) {
+		try (Connection connection = DriverManager.getConnection(dbConnectionString)) {
+			if (connection != null) {
+				String uuid = playerEntity.getUuid().toString();
+				Player player = new PlayerData().GetByUUID(connection, uuid, playerEntity.getEntityName());
+				new ChatData().Create(connection, player, message);
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
 	private void createNewDatabaseIfNotExists() {
 		try (Connection connection = DriverManager.getConnection(dbConnectionString)) {
 			if (connection != null) {
@@ -56,6 +70,7 @@ public class SqliteLogger implements ILogger {
 				new PlayerData().Schema(connection);
 				new EventData().Schema(connection);
 				new PositionData().Schema(connection);
+				new ChatData().Schema(connection);
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());

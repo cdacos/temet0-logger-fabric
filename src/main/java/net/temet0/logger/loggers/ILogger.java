@@ -6,4 +6,6 @@ public interface ILogger {
     void logMessage(String message);
 
     void logPosition(ServerPlayerEntity player, String message);
+
+    void logChat(ServerPlayerEntity player, String message);
 }

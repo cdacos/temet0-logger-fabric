@@ -45,4 +45,11 @@ public enum LoggerManager implements ILogger {
             logger.logPosition(player, message);
         }
     }
+
+    @Override
+    public void logChat(ServerPlayerEntity player, String message) {
+        for (ILogger logger : loggers) {
+            logger.logChat(player, message);
+        }
+    }
 }
