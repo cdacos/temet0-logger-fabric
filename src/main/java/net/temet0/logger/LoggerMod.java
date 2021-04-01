@@ -18,7 +18,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.temet0.logger.loggers.FileLogger;
 import net.temet0.logger.loggers.LoggerManager;
 import net.temet0.logger.loggers.SqliteLogger;
 
