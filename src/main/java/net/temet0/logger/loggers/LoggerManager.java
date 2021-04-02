@@ -49,7 +49,11 @@ public enum LoggerManager implements ILogger {
     @Override
     public void logChat(ServerPlayerEntity player, String message) {
         for (ILogger logger : loggers) {
-            logger.logChat(player, message);
+            if (player != null) {
+                logger.logChat(player, message);
+            } else {
+                logger.logMessage(message);
+            }
         }
     }
 }
