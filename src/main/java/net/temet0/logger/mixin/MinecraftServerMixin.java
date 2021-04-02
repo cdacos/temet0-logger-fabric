@@ -20,7 +20,7 @@ import net.temet0.logger.loggers.LoggerManager;
 @Environment(EnvType.SERVER)
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
-    private final String[] chatKeys = { "chat.type.advancement", "chat.type.announcement", "chat.type.text", "death", "multiplayer" };
+    private static final String[] chatKeys = { "chat.type.advancement", "chat.type.announcement", "chat.type.text", "death", "multiplayer" };
 
     @Shadow
     public abstract PlayerManager getPlayerManager();
